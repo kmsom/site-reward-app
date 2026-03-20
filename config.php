@@ -8,8 +8,8 @@ $pass = 'mecanismo2026@';
 try {
     $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$db;sslmode=require", $user, $pass);
     
-    // LINHA CORRIGIDA ABAIXO:
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ATTR_ERRMODE_EXCEPTION);
+    // Usando números (3 e 2) para o PHP não travar se o driver estiver instável
+    $pdo->setAttribute(3, 2); 
     
 } catch (PDOException $e) {
     die("Erro de conexão: " . $e->getMessage());
