@@ -1,7 +1,7 @@
 <?php
 // Configurações do seu Supabase (Pegue no painel Settings -> API)
-$supabaseUrl = 'https://SUA_URL_AQUI.supabase.co';
-$supabaseKey = 'SUA_SERVICE_ROLE_KEY_AQUI'; // Use a Service Role para permissão de escrita
+$supabaseUrl = 'https://zbeddlxzqqivtjmugaze.supabase.co';
+$supabaseKey = 'sb_publishable_X09bzyAcFLekT-FzVNb3Fw_SK9dr0zc'; // Use a Service Role para permissão de escrita
 
 // 1. Captura os dados que a Monetag envia via URL
 $userId = $_GET['user_id'] ?? null;
