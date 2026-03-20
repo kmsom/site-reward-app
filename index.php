@@ -39,7 +39,7 @@ $id_do_usuario_logado = "USUARIO_TESTE_01";
             // Enviando o ID do usuário para a Monetag identificar quem assistiu
             s.setAttribute('data-subid', '<?php echo $id_do_usuario_logado; ?>'); 
             p.appendChild(s);
-        })(document.createElement('script'), 'https://alwingulla.com/script/path.js', 3269872, document.body||document.documentElement);
+        })(document.createElement('script'), 'https://alwingulla.com/script/path.js', 10753167, document.body||document.documentElement);
     </script>
 
 </body>
