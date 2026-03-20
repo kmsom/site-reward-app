@@ -4,7 +4,7 @@ if (isset($_SESSION['user_id'])) { header("Location: dashboard.php"); exit; }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
-<head><meta charset="UTF-8"><title>Mechanism Studio - Ganhe PIX</title></head>
+<head><meta charset="UTF-8"><title>Mechanism Studio V2 - Ganhe PIX</title></head>
 <body style="background:#0a0a1a; color:white; text-align:center; font-family:sans-serif; padding-top:100px;">
     <h1>💰 Ganhe assistindo anúncios</h1>
     <p>Renda extra diária direto no seu PIX.</p><br>
