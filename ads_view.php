@@ -7,7 +7,7 @@ $mid = $_GET['m']; // ID da missão (ex: m1, m2...)
 <html>
 <head>
     <title>Carregando Anúncio...</title>
-    <script src="https://alwingulla.com/tag.min.js" data-zone="SEU_ID_DA_MONETAG_AQUI" async></script>
+    <script src="https://alwingulla.com/tag.min.js" data-zone="10753165" async></script>
 </head>
 <body style="background:#0a0a1a; color:white; text-align:center; padding-top:50px;">
 
