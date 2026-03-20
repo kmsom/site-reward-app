@@ -1,68 +1,72 @@
-<?php 
-require 'config.php'; 
-session_start(); 
 
-if(!isset($_SESSION['user_id'])) header("Location: login.php");
+<?php
+require 'config.php';
+session_start();
 $uid = $_SESSION['user_id'];
 
-// Função para checar se a missão foi feita nas últimas 24h
-function jaFez($pdo, $uid, $mid) {
-    $stmt = $pdo->prepare("SELECT id FROM missoes_concluidas 
-                           WHERE usuario_id = ? AND missao_id = ? 
-                           AND data_conclusao > NOW() - INTERVAL '24 hours'");
+// Função simples para checar se a missão foi concluída (para o visual dos botões)
+function missaoCheck($pdo, $uid, $mid) {
+    $stmt = $pdo->prepare("SELECT id FROM missoes_concluidas WHERE usuario_id = ? AND missao_id = ? AND DATE(data_conclusao) = CURDATE()");
     $stmt->execute([$uid, $mid]);
-    return $stmt->fetch();
+    return $stmt->rowCount() > 0;
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missões Diárias - Mechanism Studio</title>
+    <title>Missões - Mechanism</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style> body { background: #0a0a1a; color: white; } </style>
 </head>
-<body class="bg-[#0a0a1a] text-white min-h-screen pb-10">
+<body class="p-6">
 
-    <div class="p-6 flex items-center gap-4">
-        <a href="dashboard.php" class="text-gray-400 text-2xl">←</a>
-        <h1 class="text-xl font-bold text-[#00dcaa]">Missões Diárias</h1>
-    </div>
-
-    <div class="px-6 space-y-4">
-        <p class="text-gray-400 text-sm mb-6">Assista aos anúncios completos para liberar sua recompensa de <b>R$ 0,50</b>.</p>
-
+    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        
         <?php 
-        // Gerando 5 missões de exemplo
-        for($i=1; $i<=5; $i++): 
-            $missao_id = "missao_0$i";
-            $concluida = jaFez($pdo, $uid, $missao_id);
-        ?>
-            
-            <div class="bg-[#16162a] border <?php echo $concluida ? 'border-gray-800 opacity-60' : 'border-[#00dcaa]/30'; ?> p-5 rounded-2xl flex justify-between items-center">
-                <div>
-                    <h3 class="font-bold text-lg">Vídeo Recompensado #<?php echo $i; ?></h3>
-                    <p class="text-[#00dcaa] font-bold text-sm">+ R$ 0,50</p>
-                </div>
+        // Array de missões que você criou (Exemplo de 2 missões)
+        $minhas_missoes = [
+            ['id' => '1', 'titulo' => 'Anúncio Prata'],
+            ['id' => '2', 'titulo' => 'Anúncio Ouro']
+        ];
 
-                <?php if(!$concluida): ?>
-                    <a href="ads_view.php?m=<?php echo $missao_id; ?>" 
-                       class="bg-[#00dcaa] text-[#0a0a1a] px-5 py-2 rounded-xl font-black text-xs uppercase tracking-wider hover:scale-105 transition">
-                        ASSISTIR
-                    </a>
+        foreach($minhas_missoes as $missao): 
+            $ja_fez = missaoCheck($pdo, $uid, $missao['id']);
+        ?>
+            <div id="card-<?php echo $missao['id']; ?>" class="bg-[#16162a] p-6 rounded-3xl border <?php echo $ja_fez ? 'border-gray-800 opacity-50' : 'border-[#1f2937]'; ?>">
+                <h3 class="font-bold"><?php echo $missao['titulo']; ?></h3>
+                <p class="text-[#00dcaa] text-2xl font-black mb-4">R$ 0,50</p>
+                
+                <?php if($ja_fez): ?>
+                    <button disabled class="w-full bg-gray-800 text-gray-500 py-2 rounded-xl cursor-not-allowed">CONCLUÍDA</button>
                 <?php else: ?>
-                    <div class="bg-gray-800 text-gray-500 px-4 py-2 rounded-xl font-bold text-xs uppercase italic">
-                        CONCLUÍDO
-                    </div>
+                    <button onclick="fazerMissao('<?php echo $missao['id']; ?>')" class="w-full bg-[#00dcaa] text-black font-bold py-2 rounded-xl hover:scale-105 transition">ASSISTIR</button>
                 <?php endif; ?>
             </div>
+        <?php endforeach; ?>
 
-        <?php endfor; ?>
     </div>
 
-    <div class="mt-10 mx-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-yellow-500 text-xs text-center">
-        As missões resetam individualmente 24 horas após a conclusão.
-    </div>
+    <script>
+    function fazerMissao(id) {
+        // 1. AVISA O BANCO E MARCA A MISSÃO
+        fetch('postback.php?m=' + id)
+        .then(res => res.text())
+        .then(data => {
+            if(data.trim() === "Sucesso") {
+                // 2. DISPARA O ANÚNCIO (TAG MONETAG)
+                (function(s){
+                    s.dataset.zone='10753165';
+                    s.src='https://al5sm.com/tag.min.js';
+                })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
 
+                // 3. RECARREGA PARA ATUALIZAR SALDO E BOTÕES
+                setTimeout(() => { window.location.reload(); }, 6000);
+            } else {
+                alert("Você já concluiu esta missão hoje!");
+            }
+        });
+    }
+    </script>
 </body>
 </html>
