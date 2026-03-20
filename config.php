@@ -3,7 +3,7 @@ $host = 'db.zbeddlxzqqivtjmugaze.supabase.co'; // Host do seu print
 $port = '5432';
 $db   = 'postgres';
 $user = 'postgres';
-$pass = 'SUA_SENHA_RESETADA_AQUI'; 
+$pass = 'mecanismo2026@'; 
 
 try {
     $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$db", $user, $pass);
