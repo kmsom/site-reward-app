@@ -4,80 +4,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vídeo Recompensado</title>
+    <title>Reward App</title>
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: white; text-align: center; padding: 20px; }
-        .video-box { background: #1e293b; border: 2px solid #334155; border-radius: 20px; padding: 40px 20px; max-width: 400px; margin: 30px auto; }
-        .timer-circle { width: 80px; height: 80px; border: 4px solid #3b82f6; border-radius: 50%; line-height: 80px; font-size: 24px; margin: 0 auto 20px; font-weight: bold; color: #3b82f6; }
-        .btn-assistir { background: #3b82f6; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
-        .btn-resgatar { background: #10b981; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; display: none; width: 100%; }
-        .status-msg { margin-top: 15px; color: #94a3b8; font-size: 14px; }
+        body { 
+            font-family: sans-serif; 
+            background-color: #1a222d; /* Cor escura do print */
+            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); /* Padronagem de fundo */
+            color: white; 
+            text-align: center; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        
+        .timer-badge {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+            border: 1px solid #334155;
+        }
+
+        .ad-card {
+            background: #1e293b;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 350px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .ad-image { width: 100%; display: block; }
+        
+        .ad-content { padding: 15px; text-align: left; }
+        .ad-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        .ad-desc { font-size: 14px; color: #94a3b8; margin-bottom: 15px; }
+
+        .btn-sim {
+            background: #2563eb;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .footer-text { font-size: 12px; color: #64748b; margin: 15px 0; }
+
+        .reward-bar {
+            background: #166534;
+            color: #4ade80;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-continuar {
+            background: #1e3a8a;
+            color: #94a3b8;
+            padding: 18px;
+            width: 100%;
+            max-width: 350px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: not-allowed;
+            transition: 0.3s;
+        }
+
+        .btn-ready {
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div class="video-box">
-        <div id="timerContainer" style="display: none;">
-            <div class="timer-circle" id="timerNum">15</div>
-            <p>Assistindo anúncio... Não feche esta página!</p>
-        </div>
+    <div class="timer-badge" id="timer">00:15</div>
 
-        <div id="startContainer">
-            <h2>Ganhe 1 Pontos</h2>
-            <p>Assista ao vídeo completo para receber sua recompensa.</p>
-            <a href="https://inklinkor.com/4/10753155" target="_blank" class="btn-assistir" onclick="iniciarVideo()">
-                ▶ ASSISTIR VÍDEO
-            </a>
+    <div class="ad-card">
+        <img src="https://i.imgur.com/8QvR6fX.png" class="ad-image" alt="Ad">
+        <div class="ad-content">
+            <div class="ad-title">Arara777</div>
+            <div class="ad-desc">👉 Nova plataforma! Clique em SIM para receber seu bônus de $25!</div>
+            <button class="btn-sim" onclick="location.reload()">SIM</button>
         </div>
-
-        <button id="btnResgatar" class="btn-resgatar" onclick="liberarPontos()">
-            🎁 RESGATAR MEUS PONTOS
-        </button>
-        
-        <p class="status-msg" id="statusMsg">Anúncios por Monetag</p>
     </div>
 
+    <div class="footer-text">ads by Monetag</div>
+
+    <div class="reward-bar">
+        <span>▼ Clique para receber a recompensa!</span>
+    </div>
+
+    <button id="btnFinal" class="btn-continuar" disabled>Continuar</button>
+
     <script>
-        let tempo = 15;
-        let cronometro;
+        (function(s,u,z,p){
+            s.src=u;
+            s.setAttribute('data-zone',z);
+            p.appendChild(s);
+        })(document.createElement('script'), 'https://inklinkor.com/tag.min.js', 10753167, document.body||document.documentElement);
+    </script>
 
-        function iniciarVideo() {
-            // Esconde o botão de início e mostra o timer
-            document.getElementById('startContainer').style.display = 'none';
-            document.getElementById('timerContainer').style.display = 'block';
+    <script>
+        let timeLeft = 15;
+        const timerElement = document.getElementById('timer');
+        const btnFinal = document.getElementById('btnFinal');
 
-            // Inicia a contagem regressiva
-            cronometro = setInterval(() => {
-                tempo--;
-                document.getElementById('timerNum').innerText = tempo;
+        const countdown = setInterval(() => {
+            timeLeft--;
+            timerElement.innerText = `00:${timeLeft < 10 ? '0' + timeLeft : timeLeft}`;
 
-                if (tempo <= 0) {
-                    clearInterval(cronometro);
-                    document.getElementById('timerContainer').style.display = 'none';
-                    document.getElementById('btnResgatar').style.display = 'block';
-                    document.getElementById('statusMsg').innerText = "Vídeo finalizado! Resgate agora.";
-                }
-            }, 1000);
-        }
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.style.visibility = 'hidden';
+                btnFinal.disabled = false;
+                btnFinal.classList.add('btn-ready');
+                btnFinal.innerText = 'Continuar';
+            }
+        }, 1000);
 
-        function liberarPontos() {
-            const btn = document.getElementById('btnResgatar');
-            btn.innerText = "Processando...";
-            btn.disabled = true;
-
-            // Chama o seu postback.php via fetch (a "gambiarra" que substitui o S2S)
-            fetch(`postback.php?user_id=<?php echo $id_do_usuario_logado; ?>&status=1`)
-            .then(res => res.text())
-            .then(data => {
-                if(data.trim() === "OK") {
-                    alert("Sucesso! 10 pontos adicionados.");
-                    location.reload();
-                } else {
-                    alert("Erro no servidor. Tente novamente.");
-                    btn.disabled = false;
-                    btn.innerText = "RESGATAR MEUS PONTOS";
-                }
-            });
+        btnFinal.onclick = function() {
+            if(!this.disabled) {
+                // Chama o seu postback para dar os pontos
+                window.location.href = `postback.php?user_id=<?php echo $id_do_usuario_logado; ?>&status=1`;
+            }
         }
     </script>
 
