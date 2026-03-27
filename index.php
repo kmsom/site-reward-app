@@ -34,13 +34,13 @@
             <div><b class="text-white block text-xl">R$ 0,50</b> por anúncio</div>
             <div><b class="text-white block text-xl">R$ 10,00</b> saque mínimo</div>
         </div>
-    </div>
 
-    <div style="display:none !important;">
-        <div id="frame" style="width: 1px; height: 1px; opacity: 0;">
-            <iframe data-aa='2432077' src='//acceptable.a-ads.com/2432077/?size=Adaptive'
-                    style='border:0; padding:0; width:100%; height:100%; overflow:hidden;'></iframe>
+        <div class="mt-20 py-10 w-full flex justify-center border-t border-gray-900/50">
+            <div id="frame" style="width: 320px; height: 50px;">
+                <iframe data-aa='2432077' src='//acceptable.a-ads.com/2432077/?size=320x50'
+                        style='border:0; padding:0; width:100%; height:100%; overflow:hidden;'></iframe>
+            </div>
         </div>
     </div>
-    </body>
+</body>
 </html>
