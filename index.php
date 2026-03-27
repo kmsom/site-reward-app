@@ -8,6 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#0a0a1a] text-white font-sans">
+
+    <div class="w-full flex justify-center py-4 bg-white/5">
+        <iframe data-aa='2432077' src='//acceptable.a-ads.com/2432077/?size=728x90' 
+                style='border:0; padding:0; width:728px; height:90px; overflow:hidden;'></iframe>
+    </div>
     <div class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
         <div class="mb-8 animate-bounce">
             <span class="bg-[#00dcaa] text-[#0a0a1a] px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Lançamento 2026</span>
@@ -33,13 +38,6 @@
         <div class="mt-16 flex gap-8 text-gray-500 text-sm">
             <div><b class="text-white block text-xl">R$ 0,50</b> por anúncio</div>
             <div><b class="text-white block text-xl">R$ 10,00</b> saque mínimo</div>
-        </div>
-
-        <div class="mt-20 py-10 w-full flex justify-center border-t border-gray-900/50">
-            <div id="frame" style="width: 320px; height: 50px;">
-                <iframe data-aa='2432077' src='//acceptable.a-ads.com/2432077/?size=320x50'
-                        style='border:0; padding:0; width:100%; height:100%; overflow:hidden;'></iframe>
-            </div>
         </div>
     </div>
 </body>
