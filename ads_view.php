@@ -5,10 +5,12 @@ session_start();
 if(!isset($_SESSION['user_id'])) { header("Location: login.php"); exit; }
 
 // Segurança: Gera um token único e salva o momento do início da missão
+// IMPORTANTE: Isso precisa bater exatamente com o que o postback.php espera
 $_SESSION['ad_token'] = bin2hex(random_bytes(16));
 $_SESSION['ad_start_time'] = time();
 
-$missao_id = $_GET['m'] ?? 'missao_padrao';
+// Pega o ID da missão vindo do missoes.php
+$missao_id = $_GET['m'] ?? '1';
 $direct_link = "https://omg10.com/4/10753155"; // Seu link direto
 ?>
 <!DOCTYPE html>
@@ -35,7 +37,7 @@ $direct_link = "https://omg10.com/4/10753155"; // Seu link direto
         </div>
 
         <h2 id="titulo" class="text-2xl font-black mb-2">Ação Necessária</h2>
-        <p id="subtitulo" class="text-gray-500 text-sm mb-8 leading-relaxed">Clique no botão abaixo para ver o anúncio e liberar seu saldo de <span class="text-white font-bold">R$ 0,50</span>.</p>
+        <p id="subtitulo" class="text-gray-500 text-sm mb-8 leading-relaxed">Clique abaixo para ver o anúncio e liberar seus <span class="text-white font-bold">0.20 COINS</span>.</p>
         
         <div id="area-clique-anuncio">
             <a href="<?php echo $direct_link; ?>" target="_blank" onclick="iniciarValidacao()" 
@@ -47,7 +49,7 @@ $direct_link = "https://omg10.com/4/10753155"; // Seu link direto
         <div id="area-botao" class="hidden">
             <a href="postback.php?m=<?php echo $missao_id; ?>&token=<?php echo $_SESSION['ad_token']; ?>" 
                class="w-full bg-[#00dcaa] text-[#0a0a1a] font-black py-4 px-8 rounded-2xl shadow-[0_10px_30px_rgba(0,220,170,0.3)] hover:scale-105 active:scale-95 transition block text-center uppercase tracking-wider">
-               RECEBER R$ 0,50 AGORA
+               COLETAR RECOMPENSA
             </a>
         </div>
     </div>
