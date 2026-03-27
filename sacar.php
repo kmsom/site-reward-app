@@ -8,25 +8,39 @@ if(!isset($_SESSION['user_id'])) {
 }
 
 $uid = $_SESSION['user_id'];
-$stmt = $pdo->prepare("SELECT saldo_pontos, chave_pix FROM usuarios WHERE id = ?");
+
+// 1. BUSCA O SALDO_BRL (Dinheiro real convertido)
+$stmt = $pdo->prepare("SELECT saldo_brl, chave_pix FROM usuarios WHERE id = ?");
 $stmt->execute([$uid]); 
 $u = $stmt->fetch();
 
 $mensagem = "";
+$minimo_saque = 1.00; // Novo mínimo de R$ 1,00
 
-// Lógica de Saque
-if(isset($_POST['sacar']) && $u['saldo_pontos'] >= 10.00) {
-    $valor_saque = $u['saldo_pontos'];
+// 2. Lógica de Saque Baseada no saldo_brl
+if(isset($_POST['sacar']) && $u['saldo_brl'] >= $minimo_saque) {
+    $valor_saque = $u['saldo_brl'];
     
-    // Insere o pedido
-    $pdo->prepare("INSERT INTO saques (usuario_id, valor) VALUES (?,?)")->execute([$uid, $valor_saque]);
-    
-    // Zera o saldo
-    $pdo->prepare("UPDATE usuarios SET saldo_pontos = 0 WHERE id = ?")->execute([$uid]);
-    
-    // Atualiza a variável local para o visual mudar na hora
-    $u['saldo_pontos'] = 0;
-    $mensagem = "Saque de R$ " . number_format($valor_saque, 2, ',', '.') . " solicitado com sucesso!";
+    try {
+        $pdo->beginTransaction();
+
+        // Insere o pedido na tabela de saques
+        $stmt_saque = $pdo->prepare("INSERT INTO saques (usuario_id, valor, status, data_pedido) VALUES (?, ?, 'pendente', NOW())");
+        $stmt_saque->execute([$uid, $valor_saque]);
+        
+        // Zera o saldo_brl do usuário
+        $stmt_user = $pdo->prepare("UPDATE usuarios SET saldo_brl = 0 WHERE id = ?");
+        $stmt_user->execute([$uid]);
+        
+        $pdo->commit();
+
+        // Atualiza a variável local para o visual mudar na hora
+        $u['saldo_brl'] = 0;
+        $mensagem = "Saque de R$ " . number_format($valor_saque, 2, ',', '.') . " solicitado com sucesso!";
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $mensagem = "Erro ao processar saque. Tente novamente.";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -56,29 +70,29 @@ if(isset($_POST['sacar']) && $u['saldo_pontos'] >= 10.00) {
         <?php endif; ?>
 
         <div class="bg-[#0a0a1a] border border-gray-800 p-6 rounded-2xl mb-8 text-center">
-            <p class="text-gray-500 text-xs uppercase font-bold mb-1">Saldo para Saque</p>
+            <p class="text-gray-500 text-xs uppercase font-bold mb-1">Saldo para Saque (BRL)</p>
             <h2 class="text-4xl font-black text-[#00dcaa]">
-                <?php echo formatarGrana($u['saldo_pontos']); ?>
+                <?php echo formatarGrana($u['saldo_brl']); ?>
             </h2>
             <div class="mt-4 pt-4 border-t border-gray-800/50">
                 <p class="text-gray-500 text-[10px] uppercase mb-1">Sua Chave PIX</p>
-                <p class="text-white font-mono text-sm truncate"><?php echo $u['chave_pix']; ?></p>
+                <p class="text-white font-mono text-sm truncate"><?php echo $u['chave_pix'] ?? 'Não cadastrada'; ?></p>
             </div>
         </div>
 
         <form method="POST">
-            <?php if($u['saldo_pontos'] >= 10.00): ?>
+            <?php if($u['saldo_brl'] >= $minimo_saque): ?>
                 <button name="sacar" class="w-full bg-[#00dcaa] text-[#0a0a1a] font-bold py-4 rounded-2xl hover:bg-[#00b88e] transition transform active:scale-95 shadow-[0_10px_20px_rgba(0,220,170,0.2)]">
                     SOLICITAR PIX AGORA
                 </button>
                 <p class="text-center text-[10px] text-gray-500 mt-4">Processamento em até 24 horas úteis.</p>
             <?php else: ?>
                 <button disabled class="w-full bg-gray-800 text-gray-500 font-bold py-4 rounded-2xl cursor-not-allowed opacity-50">
-                    MÍNIMO R$ 10,00
+                    MÍNIMO R$ 1,00
                 </button>
                 <div class="mt-4 bg-yellow-500/5 border border-yellow-500/20 p-3 rounded-xl">
                     <p class="text-center text-[11px] text-yellow-500/80">
-                        Você precisa de mais <b><?php echo formatarGrana(10 - $u['saldo_pontos']); ?></b> para realizar o resgate.
+                        Você precisa de mais <b><?php echo formatarGrana($minimo_saque - $u['saldo_brl']); ?></b> para realizar o resgate.
                     </p>
                 </div>
             <?php endif; ?>
