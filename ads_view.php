@@ -1,7 +1,9 @@
 <?php
 require 'config.php';
 session_start();
-
+// Gera um token único para esta tentativa de visualização
+$_SESSION['ad_token'] = bin2hex(random_bytes(16));
+$_SESSION['ad_click_time'] = time(); // Salva o segundo exato do clique
 if(!isset($_SESSION['user_id'])) { header("Location: login.php"); exit; }
 
 $missao_id = $_GET['m'] ?? 'missao_padrao';
