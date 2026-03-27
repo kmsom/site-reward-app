@@ -1,8 +1,7 @@
-<?php
-session_start(); // 1. Sempre no topo, sem espaços antes!
+<?php 
+session_start(); 
 require 'config.php';
 
-// 2. Proteção: Se não tiver logado, manda pro login
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -10,9 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $uid = $_SESSION['user_id'];
 
-// 3. Função corrigida para PostgreSQL
 function missaoCheck($pdo, $uid, $mid) {
-    // No Postgres usamos CURRENT_DATE em vez de CURDATE()
     $sql = "SELECT id FROM missoes_concluidas WHERE usuario_id = ? AND missao_id = ? AND DATE(data_conclusao) = CURRENT_DATE";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$uid, $mid]);
@@ -23,62 +20,47 @@ function missaoCheck($pdo, $uid, $mid) {
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minhas Missões - Mechanism</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style> body { background: #0a0a1a; color: white; } </style>
+    <style> body { background: #0a0a1a; color: white; } .glass { background: rgba(22, 22, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); } </style>
 </head>
-<body class="p-6">
+<body class="p-6 pb-24">
 
     <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-black mb-8 text-[#00dcaa]">MISSÕES DISPONÍVEIS</h1>
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-2xl font-black text-[#00dcaa] uppercase tracking-tighter">Missões Disponíveis</h1>
+            <a href="dashboard.php" class="text-xs font-bold text-gray-500 hover:text-white transition">← VOLTAR</a>
+        </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <?php 
-            // Adicione suas missões aqui
             $lista = [
-                ['id' => '1', 'nome' => 'Anúncio Bronze'],
-                ['id' => '2', 'nome' => 'Anúncio Prata'],
-                ['id' => '3', 'nome' => 'Anúncio Ouro'],
+                ['id' => '1', 'nome' => 'Anúncio Bronze', 'cor' => 'blue-500'],
+                ['id' => '2', 'nome' => 'Anúncio Prata', 'cor' => 'gray-400'],
+                ['id' => '3', 'nome' => 'Anúncio Ouro', 'cor' => 'yellow-500'],
             ];
 
             foreach($lista as $m): 
                 $concluida = missaoCheck($pdo, $uid, $m['id']);
             ?>
-                <div class="bg-[#16162a] p-6 rounded-3xl border <?php echo $concluida ? 'border-gray-800 opacity-50' : 'border-gray-700'; ?>">
-                    <h3 class="font-bold text-lg"><?php echo $m['nome']; ?></h3>
-                    <p class="text-[#00dcaa] text-2xl font-black mb-4 font-mono">R$ 0,50</p>
-                    
-                    <?php if($concluida): ?>
-                        <button disabled class="w-full bg-gray-800 text-gray-500 py-3 rounded-xl font-bold uppercase cursor-not-allowed">Concluída</button>
-                    <?php else: ?>
-                        <button onclick="fazerMissao('<?php echo $m['id']; ?>')" class="w-full bg-[#00dcaa] text-black font-bold py-3 rounded-xl hover:scale-105 transition uppercase">Assistir Anúncio</button>
-                    <?php endif; ?>
+                <div class="glass p-6 rounded-[2rem] relative overflow-hidden <?php echo $concluida ? 'opacity-40' : ''; ?>">
+                    <div class="relative z-10">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-<?php echo $m['cor']; ?>"><?php echo $m['nome']; ?></span>
+                        <p class="text-2xl font-black mt-1 mb-6">0.20 <span class="text-xs opacity-50">COINS</span></p>
+                        
+                        <?php if($concluida): ?>
+                            <button disabled class="w-full bg-gray-800/50 text-gray-500 py-4 rounded-2xl font-black uppercase text-xs cursor-not-allowed">Concluída Hoje</button>
+                        <?php else: ?>
+                            <a href="ads_view.php?m=<?php echo $m['id']; ?>" class="block text-center w-full bg-[#00dcaa] text-[#0a0a1a] font-black py-4 rounded-2xl hover:scale-[1.02] transition active:scale-95 uppercase text-xs shadow-lg shadow-[#00dcaa]/10">
+                                Assistir Anúncio
+                            </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>
     </div>
 
-    <script>
-    function fazerMissao(id) {
-        // Chama o postback para dar o dinheiro e registrar a conclusão
-        fetch('postback.php?m=' + id)
-        .then(res => res.text())
-        .then(data => {
-            // Se o retorno do postback for Sucesso, dispara o anúncio
-            if(data.trim() === "Sucesso") {
-                // SCRIPT DA MONETAG
-                (function(s){
-                    s.dataset.zone='10753165';
-                    s.src='https://al5sm.com/tag.min.js';
-                })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
-
-                // Recarrega em 5 seg para o botão sumir
-                setTimeout(() => { window.location.reload(); }, 5000);
-            } else {
-                alert("Erro ou Missão já concluída!");
-            }
-        });
-    }
-    </script>
 </body>
 </html>
