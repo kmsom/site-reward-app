@@ -35,5 +35,12 @@
             <div><b class="text-white block text-xl">R$ 10,00</b> saque mínimo</div>
         </div>
     </div>
-</body>
+
+    <div style="display:none !important;">
+        <div id="frame" style="width: 1px; height: 1px; opacity: 0;">
+            <iframe data-aa='2432077' src='//acceptable.a-ads.com/2432077/?size=Adaptive'
+                    style='border:0; padding:0; width:100%; height:100%; overflow:hidden;'></iframe>
+        </div>
+    </div>
+    </body>
 </html>
