@@ -1,10 +1,12 @@
 <?php
 require 'config.php';
 session_start();
-// Gera um token único para esta tentativa de visualização
-$_SESSION['ad_token'] = bin2hex(random_bytes(16));
-$_SESSION['ad_click_time'] = time(); // Salva o segundo exato do clique
+
 if(!isset($_SESSION['user_id'])) { header("Location: login.php"); exit; }
+
+// Segurança: Gera um token único e salva o momento do início da missão
+$_SESSION['ad_token'] = bin2hex(random_bytes(16));
+$_SESSION['ad_start_time'] = time();
 
 $missao_id = $_GET['m'] ?? 'missao_padrao';
 $direct_link = "https://omg10.com/4/10753155"; // Seu link direto
@@ -43,7 +45,7 @@ $direct_link = "https://omg10.com/4/10753155"; // Seu link direto
         </div>
 
         <div id="area-botao" class="hidden">
-            <a href="postback.php?m=<?php echo $missao_id; ?>" 
+            <a href="postback.php?m=<?php echo $missao_id; ?>&token=<?php echo $_SESSION['ad_token']; ?>" 
                class="w-full bg-[#00dcaa] text-[#0a0a1a] font-black py-4 px-8 rounded-2xl shadow-[0_10px_30px_rgba(0,220,170,0.3)] hover:scale-105 active:scale-95 transition block text-center uppercase tracking-wider">
                RECEBER R$ 0,50 AGORA
             </a>
@@ -52,19 +54,17 @@ $direct_link = "https://omg10.com/4/10753155"; // Seu link direto
 
     <script>
         function iniciarValidacao() {
-            // Esconde o botão de clique inicial
+            // Esconde o botão de clique e mostra o status de validação
             document.getElementById('area-clique-anuncio').classList.add('hidden');
-            
-            // Altera os textos para o modo de espera
             document.getElementById('titulo').innerText = "Validando...";
-            document.getElementById('subtitulo').innerText = "Aguarde alguns segundos enquanto validamos sua visualização...";
+            document.getElementById('subtitulo').innerText = "Aguarde 10 segundos enquanto confirmamos sua visualização...";
             
-            // Inicia o cronômetro de 10 segundos (aumentei um pouco para garantir que o anúncio carregue)
+            // Aguarda 10 segundos para liberar o botão de recebimento
             setTimeout(() => {
                 document.getElementById('loader').classList.add('hidden');
                 document.getElementById('check-icon').classList.remove('hidden');
                 document.getElementById('titulo').innerText = "Concluído!";
-                document.getElementById('subtitulo').innerHTML = "O anúncio foi validado. Clique abaixo para coletar.";
+                document.getElementById('subtitulo').innerHTML = "Anúncio validado. Clique abaixo para coletar seu saldo.";
                 document.getElementById('area-botao').classList.remove('hidden');
             }, 10000); 
         }
