@@ -7,11 +7,12 @@ if (!isset($_SESSION['user_id']) || !isset($_GET['token'])) {
     die("Acesso negado: Token ausente.");
 }
 
+// Verifica se o token na URL é o mesmo gerado no ads_view.php
 if ($_GET['token'] !== $_SESSION['ad_token']) {
     die("Erro: Token expirado ou inválido. Tente novamente.");
 }
 
-// Verifica se passaram pelo menos 10 segundos desde o clique no ads_view
+// Verifica se o tempo mínimo (10 segundos) foi respeitado no servidor
 $tempo_minimo = 10;
 $tempo_decorrido = time() - $_SESSION['ad_start_time'];
 
@@ -27,7 +28,7 @@ $uid = $_SESSION['user_id'];
 $mid = $_GET['m'] ?? '1';
 
 try {
-    // 2. VERIFICAÇÃO DE DUPLICIDADE NO BANCO
+    // 2. VERIFICAÇÃO DE DUPLICIDADE NO BANCO (Evita ganhar 2x na mesma missão/dia)
     $check_sql = "SELECT id FROM missoes_concluidas 
                   WHERE usuario_id = ? AND missao_id = ? 
                   AND DATE(data_conclusao) = CURRENT_DATE";
@@ -39,8 +40,8 @@ try {
         
         $pdo->beginTransaction();
 
-        // 3. ATUALIZA SALDO
-        $sql_saldo = "UPDATE usuarios SET saldo_pontos = saldo_pontos + 0.50 WHERE id = ?";
+        // 3. ATUALIZA SALDO (Alterado para + 0.20 COINS)
+        $sql_saldo = "UPDATE usuarios SET saldo_pontos = saldo_pontos + 0.20 WHERE id = ?";
         $pdo->prepare($sql_saldo)->execute([$uid]);
 
         // 4. REGISTRA CONCLUSÃO
